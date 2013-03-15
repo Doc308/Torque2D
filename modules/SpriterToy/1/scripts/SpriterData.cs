@@ -157,39 +157,18 @@ function SpriterData::loadFiles(%this, %folderId)
             %path = filePath(%this.file) @ "/" @ %fileObject.name;
             if(isFile(%path))
             {      
-               echo("File path " @ %path);
-               
-               // Create a new Image Asset
-               %asset = new ImageAsset();
-               
-               %asset.AssetName = fileBase(%path);
-               %asset.setImageFile(%path);
-               
-               // Additional spriter specific data
-               %asset.type = %fileObject.type;
-               %asset.id = %fileObject.id;
-               %asset.name = %fileObject.name;
-               %asset.pivot = %fileObject.pivot_x SPC %fileObject.pivot_y;
-               
-               %tamlFile = filePath(%path) @ "/" @ fileBase(%path) @ ".asset.taml";
-               //%this.objTamlFile[%folderId, %fileObject.id] = %tamlFile;
-               TamlWrite(%asset, %tamlFile);
-               
-               // Define the new Taml Asset to the Database
-               AssetDatabase.addSingleDeclaredAsset($SpriterToy, %tamlFile);
-               
-               
-               // Query the Database for our asset
                %query = new AssetQuery();
                %count = AssetDatabase.findAssetName(%query, fileBase(%path));
                %newAsset = %query.getAsset(0);
                %obj = AssetDatabase.acquireAsset(%newAsset);
-               %asset.size = %obj.getImageSize();
-               echo("Size: " @ %obj.getImageSize());
+               
+               // Store Asset id for access
+               %this.assetName[%folderId, %fileObject.id] = %newAsset;
+               %size = %obj.getImageSize();
                AssetDatabase.releaseAsset(%newAsset);
                
-               // Store the full information into an array for access
-               %this.image[%folderId, %fileObject.id] = %asset;
+               // Store the source size into an array for access & name for reference
+               %this.imageSize[%folderId, %fileObject.id] = %size;
             }
             
             %set.add(%fileObject);

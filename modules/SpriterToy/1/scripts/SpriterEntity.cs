@@ -1,14 +1,15 @@
 // Class to represent spriter entities
 function SpriterEntity::create(%entity, %data)
 {
-   %this = new SceneObject()
+   %this = new ScriptObject()
    {
+      class = "SpriterEntity";
       x = 0;
 		y = 0;
 		data = %data;
       entity = %entity;
    };
-   %this.SpriteSet = new SimSet();
+   %this.spriteSet = new SimSet();
    return %this;
 }
 
@@ -29,11 +30,11 @@ function SpriterEntity::attachToScene(%this)
       %factor = 0.05;
       
       // Find key 0 of the mainline animation
-      echo(%anim.mainline.keySet.getCount());
-      %key = %anim.mainline.keySet.getObject(%n); // What is %n??
+      echo("maineline count: " @ %anim.mainline.keySet.getCount());
+      %key = %anim.mainline.keySet.getObject(0);
       
       // Load each object into a sprite and set its attributes.
-      %max_objects = %key.objectsSet.getCount();
+      %maxObjects = %key.objectsSet.getCount();
       
       for (%i = 0; %i < %maxObjects; %i++)
       {
@@ -50,15 +51,15 @@ function SpriterEntity::attachToScene(%this)
             %tkey = %timeline.keySet.getObject(0);
             %obj = %tkey.objectsSet.getObject(0);
             
-            // Look up the image
-            %map = %this.data.imageMap[%obj.folder, %obj.file]; // Legacy format, should be Image
+            // Look up the image size
+            %mapSize = %this.data.imageSize[%obj.folder, %obj.file];
+            %mapName = %this.data.assetName[%obj.folder, %obj.file];
+            echo("name: " @ %mapName);
             
-            // Get the bitmap size (LEGACY CALLS!! Verify)
-            %bitmapSize = %map.getSrcBitmapSize();
-            echo("bitmapSize =" SPC %bitmapSize);
-            %bitmapCenter = (getWord(%bitmapSize, 0) * 0.5) SPC (getWord(%bitmapSize, 1) * 0.5);
+            echo("bitmapSize =" SPC %mapSize);
+            %bitmapCenter = (getWord(%mapSize, 0) * 0.5) SPC (getWord(%mapSize, 1) * 0.5);
             echo("bitmapCenter =" SPC %bitmapCenter);
-            %pivotOffset = ((getWord(%bitmapSize, 0) * %obj.pivot_x) - getWord(%bitmapCenter, 0)) SPC (getWord(%bitmapSize, 1) * %obj.pivot_y - getWord(%bitmapCenter, 1));
+            %pivotOffset = ((getWord(%mapSize, 0) * %obj.pivot_x) - getWord(%bitmapCenter, 0)) SPC (getWord(%mapSize, 1) * %obj.pivot_y - getWord(%bitmapCenter, 1));
             echo("pivotOffset =" SPC %pivotOffset);
             
             // Get the relitive position
@@ -81,27 +82,28 @@ function SpriterEntity::attachToScene(%this)
             
             // Create the sprite
             %sprite = new Sprite();
-            %sprite.Image = %map;
-            %sprite.Rotation = -%obj.angle;
+            %sprite.setBodyType( static );
+            %sprite.Image = %mapName;
+            %sprite.Angle = -%obj.angle;
             echo("angle =" SPC -%obj.angle);
             %sprite.Position = %obj.x SPC %obj.y;
             echo("Position (" @ %sprite.Position @ ")");
             
-            //%sprite.rotateAroundPoint(%pivotOffset, %obj.angle);
-            //%sprite.size = (getWord(%size, 0) * %obj.x_scale) SPC (getWord(%size, 1) * %obj.y_scale);
+            %sprite.size = (getWord(%mapSize, 0) * %factor) SPC (getWord(%mapSize, 1) * %factor);
             
-            %sprite.size = (getWord(%bitmapSize, 0) * %factor) SPC (getWord(%bitmapSize, 1) * %factor);
+            //SandboxScene.add(%sprite);
             
-            echo("Image size =" SPC %map.getSrcBitmapSize());
+            echo("Image size =" SPC %mapSize);
             echo("Sprite size =" SPC %sprite.size);
-            
+
             %this.spriteSet.add(%sprite);
          }
          else
          {
             // For all transient objects:
             // Look up the image
-            %map = %data.imageMap[%object.folder, %object.file];
+            %mapSize = %data.imageSize[%object.folder, %object.file];
+            %mapName = %data.assetName[%obj.folder, %obj.file];
 
             // Get the relitive position
             %this.relx[%i] = %object.x;
@@ -115,11 +117,11 @@ function SpriterEntity::attachToScene(%this)
 
             // Create the sprite
             %sprite = new Sprite();
-            %sprite.Image = %map;
-            %sprite.Postion = %object.x SPC %object.y; 
+            %sprite.Image = %mapName;
+            %sprite.Position = %object.x SPC %object.y; 
 
             // Rotate/scale the sprite
-            %sprite.Rotation = -%object.angle;
+            %sprite.Angle = -%object.angle;
             %size = %sprite.size;
             %sprite.size = (getWord(%size, 0) * %object.x_scale) SPC (getWord(%size, 1) * %object.y_scale);
 
@@ -131,7 +133,9 @@ function SpriterEntity::attachToScene(%this)
    
    for (%i = 0; %i < %n; %i++)
    {
-      %this.spriteSet.getObject(%i).addToScene();
+      %obj = %this.spriteSet.getObject(%i);
+      SandboxScene.add(%obj);
+      //%this.spriteSet.getObject(%i).attachToScene();
    }
 }
 
@@ -154,9 +158,9 @@ function SpriterEntity::loadKeyFrame(%this, %n)
       %key = %anim.mainline.keySet.getObject(%n);
 
       // Load each object into a sprite and set its attributes.
-      %max_objects = %key.objectsSet.getCount();
+      %maxObjects = %key.objectsSet.getCount();
 
-      for (%i = 0; %i < %max_objects; %i++)
+      for (%i = 0; %i < %maxObjects; %i++)
       {
          // For each object in the mainline, determine if it is an object reference
          // (persistant object) or an object (transient object).
@@ -172,14 +176,13 @@ function SpriterEntity::loadKeyFrame(%this, %n)
             %obj = %tkey.objectsSet.getObject(0);
 
             // Look up the image map
-            %map = %this.data.imageMap[%obj.folder, %obj.file];
+            %mapSize = %this.data.imageSize[%obj.folder, %obj.file];
+            %mapName = %this.data.assetName[%obj.folder, %obj.file];
 
-            //   Get the bitmap size
-            %bitmapSize = %map.getSrcBitmapSize();
-            echo("bitmapSize =" SPC %bitmapSize);
-            %bitmapCenter = (getWord(%bitmapSize, 0) * 0.5) SPC (getWord(%bitmapSize, 1) * 0.5);
+            echo("bitmapSize =" SPC %mapSize);
+            %bitmapCenter = (getWord(%mapSize, 0) * 0.5) SPC (getWord(%mapSize, 1) * 0.5);
             echo("bitmapCenter =" SPC %bitmapCenter);
-            %pivotOffset = ((getWord(%bitmapSize, 0) * %obj.pivot_x) - getWord(%bitmapCenter, 0)) SPC (getWord(%bitmapSize, 1) * %obj.pivot_y - getWord(%bitmapCenter, 1));
+            %pivotOffset = ((getWord(%mapSize, 0) * %obj.pivot_x) - getWord(%bitmapCenter, 0)) SPC (getWord(%mapSize, 1) * %obj.pivot_y - getWord(%bitmapCenter, 1));
             echo("pivotOffset =" SPC %pivotOffset);
 
             // Get the relitive position
@@ -203,8 +206,8 @@ function SpriterEntity::loadKeyFrame(%this, %n)
 
             // Create the sprite
             %sprite = new Sprite();
-            %sprite.Image = %map;
-            %sprite.Rotation = -%obj.angle;
+            %sprite.Image = %mapName;
+            %sprite.Angle = -%obj.angle;
             echo("angle =" SPC -%obj.angle);
             %sprite.Position = %obj.x SPC %obj.y;
             echo("Position (" @ %sprite.Position @ ")");
@@ -213,9 +216,9 @@ function SpriterEntity::loadKeyFrame(%this, %n)
             
             //%sprite.size = (getWord(%size, 0) * %obj.x_scale) SPC (getWord(%size, 1) * %obj.y_scale);
 
-            %sprite.size = (getWord(%bitmapSize, 0) * %factor) SPC (getWord(%bitmapSize, 1) * %factor);
+            %sprite.size = (getWord(%mapSize, 0) * %factor) SPC (getWord(%mapSize, 1) * %factor);
 
-            echo("Image size =" SPC %map.getSrcBitmapSize());
+            echo("Image size =" SPC %mapSize);
             echo("Sprite size =" SPC %sprite.size);
 
             %this.spriteSet.add(%sprite);
@@ -224,7 +227,8 @@ function SpriterEntity::loadKeyFrame(%this, %n)
          {
             // For all transient objects:
             // Look up the image map
-            %map = %data.imageMap[%object.folder, %object.file];
+            %mapSize = %data.imageSize[%object.folder, %object.file];
+            %mapName = %this.data.assetName[%obj.folder, %obj.file];
 
             // Get the relitive position
             %this.relx[%i] = %object.x;
@@ -238,11 +242,11 @@ function SpriterEntity::loadKeyFrame(%this, %n)
             
             // Create the sprite
             %sprite = new Sprite();
-            %sprite.Image = %map;
+            %sprite.Image = %mapName;
             %sprite.Postion = %object.x SPC %object.y; 
 
             // Rotate/scale the sprite
-            %sprite.Rotation = -%object.angle;
+            %sprite.Angle = -%object.angle;
             %size = %sprite.size;
             %sprite.size = (getWord(%size, 0) * %object.x_scale) SPC (getWord(%size, 1) * %object.y_scale);
 

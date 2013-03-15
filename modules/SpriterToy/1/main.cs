@@ -26,7 +26,7 @@ function SpriterToy::create( %this )
     $SpriterToy = Sandbox.ActiveToy;
     exec("./scripts/Spriter.cs");
     exec("./scripts/SpriterData.cs");
-    //exec("./scripts/SpriterEntity.cs");
+    exec("./scripts/SpriterEntity.cs");
     
     %object = new Sprite();
     
@@ -39,8 +39,9 @@ function SpriterToy::create( %this )
       
     %SpriterData = %Spriter.load(%file);
     
-    $test = %SpriterData;
-    $test2 = %SpriterData.image[1,0];
+    $SpriterEntity = %Spriter.createEntity(0);
+
+    SpriterEntity::attachToScene($SpriterEntity);
     
     // Set the sandbox drag mode availability.
     Sandbox.allowManipulation( pan );

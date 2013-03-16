@@ -28,21 +28,6 @@ function SpriterToy::create( %this )
     exec("./scripts/SpriterData.cs");
     exec("./scripts/SpriterEntity.cs");
     
-    %object = new Sprite();
-    
-    //Load in the SCML file(s)
-    %dir = getCurrentDirectory(); // Limit search to program directory hub
-    %file = findFirstFile(%dir @ "/*.SCML");
-    
-    if(isFile(%file))
-      %Spriter = Spriter::create();
-      
-    %SpriterData = %Spriter.load(%file);
-    
-    $SpriterEntity = %Spriter.createEntity(0);
-
-    SpriterEntity::attachToScene($SpriterEntity);
-    
     // Set the sandbox drag mode availability.
     Sandbox.allowManipulation( pan );
     
@@ -66,6 +51,19 @@ function SpriterToy::reset( %this )
 {
     // Clear the scene.
     SandboxScene.clear();
+    
+    //Load in the SCML file(s)
+    %dir = getCurrentDirectory(); // Limit search to program directory hub
+    %file = findFirstFile(%dir @ "/*.SCML");
+    
+    if(isFile(%file))
+      %Spriter = Spriter::create();
+      
+    %SpriterData = %Spriter.load(%file);
+    
+    $SpriterEntity = %Spriter.createEntity(0);
+
+    SpriterEntity::attachToScene($SpriterEntity);
 }
 
 //-----------------------------------------------------------------------------

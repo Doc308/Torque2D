@@ -76,7 +76,7 @@ function SpriterEntity::attachToScene(%this)
             
             // Calculate the position
             %obj.x = (%obj.x - getWord(%pivotOffset, 0) + getWord(%pivotOffsetAdjustment, 0)) * %factor;
-            %obj.y = (%obj.y - getWord(%pivotOffset, 1) + getWord(%pivotOffsetAdjustment, 1)) * -%factor;
+            %obj.y = (%obj.y - getWord(%pivotOffset, 1) + getWord(%pivotOffsetAdjustment, 1)) * %factor;
             
             echo("Object (" @ %obj.x @ ", " @ %obj.y @ ")");
             
@@ -200,7 +200,7 @@ function SpriterEntity::loadKeyFrame(%this, %n)
 
             // Calculate the position
             %obj.x = (%obj.x - getWord(%pivotOffset, 0) + getWord(%pivotOffsetAdjustment, 0)) * %factor;
-            %obj.y = (%obj.y - getWord(%pivotOffset, 1) + getWord(%pivotOffsetAdjustment, 1)) * -%factor;
+            %obj.y = (%obj.y - getWord(%pivotOffset, 1) + getWord(%pivotOffsetAdjustment, 1)) * %factor;
 
             echo("Object (" @ %obj.x @ ", " @ %obj.y @ ")");
 

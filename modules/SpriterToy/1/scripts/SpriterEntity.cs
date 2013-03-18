@@ -30,7 +30,7 @@ function SpriterEntity::attachToScene(%this)
       %factor = 0.05;
       
       // Find key 0 of the mainline animation
-      echo("maineline count: " @ %anim.mainline.keySet.getCount());
+      echo("mainline count: " @ %anim.mainline.keySet.getCount());
       %key = %anim.mainline.keySet.getObject(0);
       
       // Load each object into a sprite and set its attributes.
@@ -84,8 +84,8 @@ function SpriterEntity::attachToScene(%this)
             %sprite = new Sprite();
             %sprite.setBodyType( static );
             %sprite.Image = %mapName;
-            %sprite.Angle = -%obj.angle;
-            echo("angle =" SPC -%obj.angle);
+            %sprite.Angle = %obj.angle;
+            echo("angle =" SPC %obj.angle);
             %sprite.Position = %obj.x SPC %obj.y;
             echo("Position (" @ %sprite.Position @ ")");
             
@@ -121,7 +121,7 @@ function SpriterEntity::attachToScene(%this)
             %sprite.Position = %object.x SPC %object.y; 
 
             // Rotate/scale the sprite
-            %sprite.Angle = -%object.angle;
+            %sprite.Angle = %object.angle;
             %size = %sprite.size;
             %sprite.size = (getWord(%size, 0) * %object.x_scale) SPC (getWord(%size, 1) * %object.y_scale);
 
@@ -207,8 +207,8 @@ function SpriterEntity::loadKeyFrame(%this, %n)
             // Create the sprite
             %sprite = new Sprite();
             %sprite.Image = %mapName;
-            %sprite.Angle = -%obj.angle;
-            echo("angle =" SPC -%obj.angle);
+            %sprite.Angle = %obj.angle;
+            echo("angle =" SPC %obj.angle);
             %sprite.Position = %obj.x SPC %obj.y;
             echo("Position (" @ %sprite.Position @ ")");
 
@@ -246,7 +246,7 @@ function SpriterEntity::loadKeyFrame(%this, %n)
             %sprite.Postion = %object.x SPC %object.y; 
 
             // Rotate/scale the sprite
-            %sprite.Angle = -%object.angle;
+            %sprite.Angle = %object.angle;
             %size = %sprite.size;
             %sprite.size = (getWord(%size, 0) * %object.x_scale) SPC (getWord(%size, 1) * %object.y_scale);
 

@@ -1,0 +1,11 @@
+<ModuleDefinition
+	ModuleId="NoiseToy"
+	VersionId="1"
+	Description="Demonstrates generating noise and smoothing it."
+	Dependencies="ToyAssets=1"
+	Type="toy"
+	ToyCategoryIndex="3"
+	ScriptFile="main.cs"
+	CreateFunction="create"
+	DestroyFunction="destroy">
+</ModuleDefinition>
